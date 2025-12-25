@@ -85,7 +85,7 @@
       "payable": 398,
       "outlet": "La Pino'z",
       "campus": "Punjab",
-      "status": "Accepted",
+      "status": "Picked",
       "timestamp": "2025-09-15T14:53:43.119Z",
       "pickupCode": "3RKJYR"
     },
@@ -122,6 +122,33 @@
       "status": "Accepted",
       "timestamp": "2025-09-15T14:54:27.967Z",
       "pickupCode": "A8NR8G"
+    },
+    {
+      "id": "1758021333699",
+      "items": [
+        {
+          "id": "k3",
+          "name": "Chicken Burger",
+          "price": 99,
+          "qty": 1,
+          "image": "/menu/kfc/kfc_vegburger.jpg"
+        },
+        {
+          "id": "k6",
+          "name": "French Fries",
+          "price": 99,
+          "qty": 1,
+          "image": "/menu/kfc/kfc_fries.jpeg"
+        }
+      ],
+      "total": 198,
+      "discount": 0,
+      "payable": 198,
+      "outlet": "KFC",
+      "campus": "Punjab",
+      "status": "Picked",
+      "timestamp": "2025-09-16T11:15:33.699Z",
+      "pickupCode": "DRQUTC"
     }
   ]
 }

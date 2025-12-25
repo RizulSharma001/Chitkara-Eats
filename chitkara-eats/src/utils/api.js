@@ -1,11 +1,13 @@
-const API_URL = 'http://localhost:5000/api';
+export const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api';
 
 export const saveOrder = async (orderData) => {
   try {
+    const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
       },
       body: JSON.stringify(orderData),
     });
@@ -18,11 +20,27 @@ export const saveOrder = async (orderData) => {
 
 export const getOrders = async () => {
   try {
-    const response = await fetch(`${API_URL}/orders`);
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/orders`, {
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
+    });
     const data = await response.json();
-    return data.orders || data; // support raw array or {orders}
+    return data.orders || data;
   } catch (error) {
     console.error('Error fetching orders:', error);
+    throw error;
+  }
+};
+
+export const getAllOrders = async () => {
+  try {
+    const response = await fetch(`${API_URL}/orders/all`);
+    const data = await response.json();
+    return data.orders || data;
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
     throw error;
   }
 };
@@ -107,6 +125,26 @@ export const acceptByCode = async (code) => {
     return await res.json();
   } catch (error) {
     console.error('Error accepting by code:', error);
+    throw error;
+  }
+};
+
+export const deleteOrder = async (orderId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_URL}/orders/${orderId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Failed to delete order');
+    }
+    return await res.json();
+  } catch (error) {
+    console.error('Error deleting order:', error);
     throw error;
   }
 };

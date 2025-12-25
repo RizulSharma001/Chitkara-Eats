@@ -1,109 +1,175 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { API_URL } from "../utils/api.js";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
+import LoadingOverlay from "../components/LoadingOverlay.jsx";
 
 export default function Account() {
-  // Profile state
-  const [profileName, setProfileName] = useState("Rahul");
-  const [profileUniversity, setProfileUniversity] = useState("Chitkara University");
-  const [preferences, setPreferences] = useState("Veg • No onions");
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [loyaltyStamps, setLoyaltyStamps] = useState(0);
+  const [rewardPoints, setRewardPoints] = useState(0);
+  const [uMoneyBalance, setUMoneyBalance] = useState(0);
 
-  // Simulated save function
-  const handleSave = () => {
-    alert("Changes saved successfully!");
-    // Here you would call your backend API to update user info
+  useEffect(() => {
+    if (user) fetchUserData();
+  }, [user]);
+
+  const fetchUserData = async () => {
+    try {
+      const [loyaltyRes, rewardsRes, umoneyRes] = await Promise.all([
+        fetch(`${API_URL}/loyalty/status/${user.id}`),
+        fetch(`${API_URL}/rewards/balance/${user.id}`),
+        fetch(`${API_URL}/umoney/balance/${user.id}`)
+      ]);
+
+      const loyaltyData = await loyaltyRes.json();
+      const rewardsData = await rewardsRes.json();
+      const umoneyData = await umoneyRes.json();
+
+      setLoyaltyStamps(loyaltyData.stamps || 0);
+      setRewardPoints(rewardsData.points || 0);
+      setUMoneyBalance(umoneyData.balance || 0);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
-  // Simulated logout function
-  const handleLogout = () => {
-    alert("Logged out successfully!");
-    // Add your logout logic here (clear tokens, redirect, etc)
+  const goToWallet = () => navigate("/wallet");
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    logout();
+    setLoggingOut(false);
+    navigate("/order-food");
   };
+
+  if (!user) {
+    return (
+      <section className="max-w-4xl mx-auto py-20 text-center">
+        <h1 className="text-3xl font-bold mb-2">Please Sign In</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          You need to be logged in to view your account.
+        </p>
+      </section>
+    );
+  }
 
   return (
-    <section className="max-w-4xl mx-auto p-8 space-y-10">
-      <h1 className="text-4xl font-extrabold text-gray-900 dark:text-gray-100">
-        Account Settings
-      </h1>
+    <>
+      {loggingOut && <LoadingOverlay message="Signing you out..." />}
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 grid gap-10 sm:grid-cols-2">
-        {/* Profile Section */}
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Profile
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={profileName}
-                onChange={(e) => setProfileName(e.target.value)}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="university"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                University
-              </label>
-              <input
-                id="university"
-                type="text"
-                value={profileUniversity}
-                onChange={(e) => setProfileUniversity(e.target.value)}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
-              />
-            </div>
+      <section className="max-w-5xl mx-auto px-4 pt-6 pb-12 space-y-8">
+
+        {/* ================= HEADER ================= */}
+        <div className="flex items-center gap-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white text-3xl font-bold">
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {user.name}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
           </div>
         </div>
 
-        {/* Preferences Section */}
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Preferences
+        {/* ================= PROFILE INFO ================= */}
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Profile Information
           </h2>
-          <div className="space-y-4">
-            <label
-              htmlFor="preferences"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Info label="Name" value={user.name} />
+            <Info label="Email" value={user.email} />
+            {user.phone && <Info label="Phone" value={user.phone} />}
+          </div>
+        </div>
+
+        {/* ================= STATS ================= */}
+        <div className="grid md:grid-cols-3 gap-6">
+
+          {/* Loyalty */}
+          <StatCard
+            title="Loyalty Stamps"
+            value={`${loyaltyStamps}/10`}
+            subtitle={`Order ${10 - loyaltyStamps} more times to earn a free item`}
+            color="orange"
+            progress={(loyaltyStamps / 10) * 100}
+          />
+
+          {/* Rewards */}
+          <StatCard
+            title="Reward Points"
+            value={rewardPoints}
+            subtitle="1 point = ₹1 (Redeem at checkout)"
+            color="blue"
+          />
+
+          {/* Wallet */}
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm space-y-3">
+            <h3 className="font-semibold text-gray-900 dark:text-white">
+              U-Money Wallet
+            </h3>
+            <p className="text-3xl font-bold text-green-600">
+              ₹{uMoneyBalance}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Pay using wallet balance & rewards
+            </p>
+            <button
+              onClick={goToWallet}
+              className="mt-2 w-full py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium"
             >
-              Dietary Preferences
-            </label>
-            <textarea
-              id="preferences"
-              value={preferences}
-              onChange={(e) => setPreferences(e.target.value)}
-              rows={5}
-              className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="E.g., Veg, No onions, Gluten-free..."
-            />
+              Open Wallet
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-4">
-        <button
-          onClick={handleSave}
-          className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md shadow-md transition"
-        >
-          Save Changes
-        </button>
+        {/* ================= LOGOUT ================= */}
+        <div className="flex justify-end">
+          <button
+            onClick={handleLogout}
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow"
+          >
+            Logout
+          </button>
+        </div>
+      </section>
+    </>
+  );
+}
 
-        <button
-          onClick={handleLogout}
-          className="px-6 py-3 border border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-semibold rounded-md shadow-md transition"
-        >
-          Logout
-        </button>
+/* ================= SMALL UI COMPONENTS ================= */
+
+function Info({ label, value }) {
+  return (
+    <div>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+      <div className="mt-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
+        {value}
       </div>
-    </section>
+    </div>
+  );
+}
+
+function StatCard({ title, value, subtitle, color, progress }) {
+  return (
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm space-y-3">
+      <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
+      <p className={`text-3xl font-bold text-${color}-600`}>{value}</p>
+      {progress !== undefined && (
+        <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+          <div
+            className={`h-2 bg-${color}-500 rounded-full`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
+      <p className="text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>
+    </div>
   );
 }

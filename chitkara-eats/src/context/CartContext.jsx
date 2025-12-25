@@ -7,7 +7,15 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export function CartProvider({ children }) {
-  const [cart, setCart] = useState({ outlet: null, items: [] });
+  // Initialize cart from localStorage if available, otherwise empty.
+  const [cart, setCart] = useState(() => {
+    try {
+      const raw = localStorage.getItem('ce_cart');
+      return raw ? JSON.parse(raw) : { outlet: null, items: [] };
+    } catch (e) {
+      return { outlet: null, items: [] };
+    }
+  });
   const [alertDialog, setAlertDialog] = useState({ isOpen: false, menuItem: null, outlet: null });
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
@@ -141,6 +149,15 @@ export function CartProvider({ children }) {
 
   // Total cart value
   const total = cart.items.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+  // Persist cart to localStorage whenever it changes
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('ce_cart', JSON.stringify(cart));
+    } catch (e) {
+      // ignore
+    }
+  }, [cart]);
 
   return (
     <CartContext.Provider

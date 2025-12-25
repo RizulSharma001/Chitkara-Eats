@@ -1,7 +1,7 @@
 // tailwind.config.js
 
 module.exports = {
-  darkMode: 'class', // 👈 important for manual toggling
+  darkMode: 'class', 
   content: [
     './index.html',
     './src/**/*.{js,jsx,ts,tsx}',

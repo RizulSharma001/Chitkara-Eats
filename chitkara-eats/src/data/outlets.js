@@ -11,7 +11,7 @@ export const OUTLETS = [
     min: 99,
     image: "/outlets/dominos.jpg",
     menu: [
-      { id: "d1", name: "Margherita Pizza", desc: "Classic cheese", price: 199, image: "/menu/dominos/dominos_margherita.png", category: "Pizzas", isVeg: true },
+      { id: "d1", name: "Margherita Pizza", desc: "Classic cheese", price: 149, image: "/menu/dominos/dominos_margherita.png", category: "Pizzas", isVeg: true },
       { id: "d2", name: "Pepperoni Pizza", desc: "Spicy pepperoni", price: 249, image: "/menu/dominos/dominos_pepperoni.avif", category: "Pizzas", isVeg: false },
       { id: "d3", name: "Garlic Bread", desc: "Buttery, cheesy", price: 79, image: "/menu/dominos/dominos_garlic.avif", category: "Sides", isVeg: true },
       { id: "d4", name: "FarmHouse Pizza", desc: "Classic cheese", price: 399, image: "/menu/dominos/dominos_farmhouse.webp", category: "Pizzas", isVeg: true },

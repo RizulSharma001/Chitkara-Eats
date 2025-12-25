@@ -1,5 +1,5 @@
 {
-  "name": "chitkara-eats-root",
+  "name": "campus-eats-root",
   "private": true,
   "scripts": {
     "install-all": "npm --prefix backend install && npm --prefix chitkara-eats install",
