@@ -2,13 +2,14 @@
   "name": "campus-eats-root",
   "private": true,
   "scripts": {
-    "install-all": "npm --prefix backend install && npm --prefix chitkara-eats install",
+    "install-all": "npm install && npm --prefix backend install && npm --prefix chitkara-eats install",
+    "build": "npm install && npm --prefix backend install && npm --prefix chitkara-eats install && npm --prefix chitkara-eats run build",
+    "start": "node backend/server.js",
     "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix chitkara-eats run dev\"",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix chitkara-eats run dev"
   },
   "dependencies": {
-    "@react-leaflet/core": "^3.0.0",
     "jsqr": "^1.4.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.542.0",
