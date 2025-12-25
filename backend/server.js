@@ -12,7 +12,7 @@ import Rating from './models/ratings.js';
 import Transaction from './models/transactions.js';
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 const JWT_SECRET = 'campus-eats-secret-key-2025';
 
 app.use(cors());
@@ -719,8 +719,8 @@ app.post('/api/rewards/redeem', async (req, res) => {
 	}
 });
 
-app.listen(port,"0.0.0.0", () => {
-	console.log(`Server running at http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+    console.log(`✅ Server is live on port ${port}`);
 });
 
 // Razorpay endpoints
