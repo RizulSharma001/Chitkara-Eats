@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb://localhost:27017/chitkaraeats');
-    console.log("MongoDB connected");
+    // Ab ye Render ki Environment Settings se Atlas wali link uthayega
+    await mongoose.connect(process.env.MONGODB_URI); 
+    console.log("✅ MongoDB connected successfully");
   } catch (error) {
-    console.error("MongoDB connection error:", error);
+    console.error("❌ MongoDB connection error:", error);
     process.exit(1);
-  } }
+  } 
+}
 
-
-  export default connectDB;
-
+export default connectDB;
